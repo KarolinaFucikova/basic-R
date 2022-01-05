@@ -1,0 +1,76 @@
+# before you start, make a folder, e.g. BIO360 on your desktop if you don't have one yet
+# then create a folder Rprojects inside BIO360
+# capital letters matter, dashes, spaces etc. in names do too - name everything exactly
+
+# set the working directory
+# this is where you will get stuff from, and save stuff to on your computer
+
+setwd("~/Desktop/BIO360/Rprojects")
+# note, if you are working on a PC, it might be more like this:
+# C:\Desktop\BIO360\Rprojects
+# or C:\Users...
+# not sure where to start? Try
+# getwd
+# it will tell you where you currently are on your computer
+# good news - you only have to figure it out once
+
+# get the seed data in csv format (download from Brightspace, save to your Rprojects folder)
+BIO360_seeds <- read.csv(file.choose())
+# R is smart and will assume column names are in the first row
+
+#try some different data visualization/exploration graphs)
+boxplot(BIO360_seeds$maple)
+# what do you think the $ does in BIO360_seeds$maple ?
+
+hist(BIO360_seeds$maple)
+# now make a histogram for each of the remaining columns
+# do the data look normal?
+
+# calculate means, variances and standard deviations for the four columns:
+var(BIO360_seeds$maple,na.rm=TRUE)
+# the na.rm=TRUE ensures that R will ignore missing values
+# calculate variances for the remaining columns
+# standard deviations can be calculated as sd() and means as mean()
+# calculate sd and mean for each column
+
+# t-test in R is simple
+# try your hand at running a t test to compare maple2 and elm2 columns
+# the formula is:
+# t.test(sample1,sample2,paired=FALSE,var.equal=TRUE)
+# before you do the test, verify if the variance truly is equal (or similar) in maple2 and elm2
+# if variances are very different from each other, use "var.equal=FALSE" instead
+
+# if distribution of data is not normal, a U test can be done using wilcox.test()
+
+#####
+# let's try the chi-square test of independence on the bird data
+BIO360_birds <- read.csv(file.choose(), row.names=1)
+# R is not smart enough to assume row names are in the first column, so we have to tell it
+# see what it looks like by typing/running:
+BIO360_birds
+
+# this format happens to be all set for running a chi-square test
+# R will calculate the expected values table and will run the test if you run a line like so:
+chisq.test(BIO360_birds)
+# some errors appear but the test was run - examine the results
+
+# if you want to examine the results more, save them into an object, let's call it chi
+
+chi <- chisq.test(BIO360_birds) 
+#then try:
+chi$expected
+chi$res
+# the latter shows the Pearson residuals
+
+# we can graph the residuals too, to see which birds are over or underrepresented in which habitats:
+barplot(t(chi$res),beside=TRUE,legend=TRUE)
+# a little messy but we can learn how to do a cleaner version some other time
+abline(h=c(-2,2),lty="dotted")
+#adding lines for the commonly used cut-offs for significance
+title(xlab="Invertebrate taxa",ylab="Pearson residual")
+# some more labeling of the graph
+
+###
+# making the graph just a tad more legible requires some more arguments in the barplot command:
+barplot(t(chi$res),beside=TRUE,legend=TRUE, args.legend=list(bty="n",x="bottomright"),ylim=c(-4,4))
+#still not awesome but try playing with the values to see how different parts move around
